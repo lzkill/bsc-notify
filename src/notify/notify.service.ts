@@ -42,7 +42,10 @@ export class NotifyService {
       if (this.config.app.enabled) {
         let message;
         switch (job.event) {
-          case TradeEvent.TRADE_OPEN || TradeEvent.TRADE_BROKEN:
+          case TradeEvent.TRADE_OPEN:
+            message = formatTradeOpenMessage(job.event, job.trade);
+            break;
+          case TradeEvent.TRADE_BROKEN:
             message = formatTradeOpenMessage(job.event, job.trade);
             break;
           case TradeEvent.TRADE_CLOSED:
