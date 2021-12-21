@@ -1,0 +1,18 @@
+{
+  "app": {
+    "name": "bsc-notify",
+    "enabled": true
+  },
+  "papertrail": {
+    "token": "",
+    "enabled": true
+  },
+  "rabbitmq": {
+    "uri": ""
+  },
+  "telegram": {
+    "token": "",
+    "chatId": "",
+    "enabled": true
+  }
+}
