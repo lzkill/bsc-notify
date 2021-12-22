@@ -10,7 +10,7 @@ import {
   formatTradeClosedMessage,
   formatTradeOpenMessage,
 } from './telegram-messages';
-import { TelegramService } from './telegram.service';
+import { TelegramService } from './rate-limited/telegram.service';
 import { Trade, TradeEvent } from './trade-interfaces';
 
 export interface NotifyJob {
@@ -53,7 +53,6 @@ export class NotifyService {
             break;
         }
 
-        // TODO Rate limit it
         if (message) this.telegram.sendMessage(message);
       }
     } catch (e) {

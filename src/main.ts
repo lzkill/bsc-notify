@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TelegramService } from './notify/telegram.service';
+import { TelegramService } from './notify/rate-limited/telegram.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

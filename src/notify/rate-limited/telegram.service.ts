@@ -9,10 +9,12 @@ import {
   formatServiceEnabledMessage,
   formatWelcomeMessage,
 } from './telegram-messages';
+import Bottleneck from 'bottleneck';
 
 @Injectable()
 export class TelegramService {
   private bot: Telegraf;
+  private limiter: Bottleneck
 
   constructor(
     private config: AppConfigService,
@@ -24,6 +26,8 @@ export class TelegramService {
   }
 
   async init() {
+    this.setRateLimiter();
+
     if (this.config.telegram.token) {
       this.bot.command('bns_start', async (ctx) => {
         try {
@@ -92,17 +96,27 @@ export class TelegramService {
     }
   }
 
+  private setRateLimiter() {
+    this.limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: 5000,
+    });
+    this.limiter.on('error', function (error) {
+      console.error(error);
+    });
+  }
+
   sendMessage(message: string, chatId?: any, removeWhiteSpaces = true) {
     if (this.canChat() && this.config.telegram.enabled) {
       let formatted = message.trim();
       if (removeWhiteSpaces) formatted = this.removeWhiteSpaces(formatted);
-      return this.bot.telegram.sendMessage(
+      return this.limiter.schedule(() =>this.bot.telegram.sendMessage(
         chatId ? chatId : this.config.telegram.chatId,
         formatted,
         {
           parse_mode: 'HTML',
         },
-      );
+      ));
     }
   }
 
