@@ -53,6 +53,7 @@ export class NotifyService {
             break;
         }
 
+        // TODO Rate limit it
         if (message) this.telegram.sendMessage(message);
       }
     } catch (e) {
