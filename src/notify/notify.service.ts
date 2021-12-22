@@ -6,10 +6,8 @@ import {
 } from 'src/app-constants';
 import { AppConfigService } from 'src/config/config.service';
 import { AppLoggerService } from 'src/shared/logger/logger.service';
-import {
-  formatTradeClosedMessage,
-  formatTradeOpenMessage,
-} from './telegram-messages';
+import { formatTradeOpenMessage, formatTradeClosedMessage } from './rate-limited/telegram-messages';
+
 import { TelegramService } from './rate-limited/telegram.service';
 import { Trade, TradeEvent } from './trade-interfaces';
 
