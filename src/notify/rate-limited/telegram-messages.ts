@@ -1,4 +1,4 @@
-import { Trade, TradeEvent } from './trade-interfaces';
+import { TradeEvent, Trade } from "../trade-interfaces";
 
 const StringBuilder = require('string-builder');
 const emoji = require('node-emoji');
