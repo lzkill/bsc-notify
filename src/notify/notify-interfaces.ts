@@ -25,8 +25,23 @@ export interface Trade {
   type?: string;
 }
 
+export interface Order {
+  amount: string;
+  base: string;
+  checkedAt?: Date;
+  createdAt: Date;
+  id: number;
+  isQuote: boolean;
+  notBefore?: Date;
+  op: string;
+  refPrice?: string;
+  status: string;
+  offer?: Offer;
+}
+
 export enum TradeEvent {
   TRADE_OPEN = 'trade-open',
   TRADE_BROKEN = 'trade-broken',
   TRADE_CLOSED = 'trade-closed',
+  ORDER_CLOSED = 'order-closed'
 }

@@ -1,4 +1,4 @@
-import { TradeEvent, Trade } from "../trade-interfaces";
+import { Order, Trade, TradeEvent } from '../notify-interfaces';
 
 const StringBuilder = require('string-builder');
 const emoji = require('node-emoji');
@@ -41,28 +41,29 @@ export function formatGeneralInfoMessage(message: string) {
   return `${prefix}${message}`;
 }
 
-export function formatTradeOpenMessage(event: TradeEvent, trade: Trade) {
-  const profile = tradeProfile(trade);
+export function formatTradeOpenMessage(trade: Trade, event: TradeEvent) {
+  const sb = new StringBuilder();
 
   const icon =
     event === TradeEvent.TRADE_BROKEN
       ? emoji.get(':black_circle:')
       : emoji.get(':white_circle:');
-
   const title = `Trade #${trade.id} ${event.replace('trade-', '')}:`;
-
-  const sb = new StringBuilder();
-
   sb.append(`${icon} ${bold(title)}`);
+
   sb.appendLine();
+
   if (trade.owner) sb.appendLine(`${bold('Owner:')} ${trade.owner}`);
   if (trade.type) sb.appendLine(`${bold('Type:')} ${trade.type}`);
   if (trade.strategy) sb.appendLine(`${bold('Strategy:')} ${trade.strategy}`);
   sb.appendLine(`${bold('Base:')} ${trade.openOffer.base}`);
   sb.appendLine(`${bold('Open offer:')} ${trade.openOffer.offerId}`);
+
+  const profile = tradeProfile(trade);
   sb.appendLine(
     `${bold('Open amount:')} ${profile.openAmount} ${profile.profitCoin}`,
   );
+
   sb.appendLine(`${bold('Operation:')} ${trade.openOffer.op}`);
   sb.appendLine(`${bold('EfPrice:')} ${trade.openOffer.efPrice}`);
 
@@ -70,8 +71,9 @@ export function formatTradeOpenMessage(event: TradeEvent, trade: Trade) {
 }
 
 export function formatTradeClosedMessage(trade: Trade) {
-  const profile = tradeProfile(trade);
+  const sb = new StringBuilder();
 
+  const profile = tradeProfile(trade);
   const profit = {
     abs: profile.closeAmount - profile.openAmount,
     perc: percent(profile.openAmount, profile.closeAmount),
@@ -86,16 +88,11 @@ export function formatTradeClosedMessage(trade: Trade) {
     icon = emoji.get(':large_green_circle:');
     profitTitle = 'Profit:';
   }
-
-  const profitAbs = formatFractionDigits(profit.abs, profile.profitCoin);
-  const profitPerc = profit.perc.toFixed(2);
   const title = `Trade #${trade.id} closed:`;
-  const duration = getTradeDuration(trade);
-
-  const sb = new StringBuilder();
-
   sb.append(`${icon} ${bold(title)}`);
+
   sb.appendLine();
+
   if (trade.owner) sb.appendLine(`${bold('Owner:')} ${trade.owner}`);
   if (trade.type) sb.appendLine(`${bold('Type:')} ${trade.type}`);
   if (trade.strategy) sb.appendLine(`${bold('Strategy:')} ${trade.strategy}`);
@@ -108,10 +105,41 @@ export function formatTradeClosedMessage(trade: Trade) {
   sb.appendLine(
     `${bold('Close amount:')} ${profile.closeAmount} ${profile.profitCoin}`,
   );
+
+  const profitAbs = formatFractionDigits(profit.abs, profile.profitCoin);
+  const profitPerc = profit.perc.toFixed(2);
   sb.appendLine(
     `${bold(profitTitle)} ${profitAbs} ${profile.profitCoin} (${profitPerc}%)`,
   );
+
+  const duration = getTradeDuration(trade);
   sb.appendLine(`${bold('Duration:')} ${duration}`);
+
+  return sb.toString();
+}
+
+export function formatOrderClosedMessage(order: Order) {
+  const sb = new StringBuilder();
+
+  const icon = emoji.get(':large_blue_circle:');
+  const title = `Order #${order.id} closed:`;
+  sb.append(`${icon} ${bold(title)}`);
+
+  sb.appendLine();
+
+  sb.appendLine(`${bold('Close offer:')} ${order.offer.offerId}`);
+  sb.appendLine(
+    `${bold('Base amount:')} ${order.offer.baseAmount} ${order.offer.base}`,
+  );
+  sb.appendLine(
+    `${bold('Quote amount:')} ${order.offer.quoteAmount} ${order.offer.quote}`,
+  );
+  sb.appendLine(`${bold('Operation:')} ${order.offer.op}`);
+
+  const efPrice = order.refPrice
+    ? `${order.refPrice} ref X real ${order.offer.efPrice}`
+    : order.offer.efPrice;
+  sb.appendLine(`${bold('EfPrice:')} ${efPrice}`);
 
   return sb.toString();
 }

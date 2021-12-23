@@ -6,14 +6,14 @@ import {
 } from 'src/app-constants';
 import { AppConfigService } from 'src/config/config.service';
 import { AppLoggerService } from 'src/shared/logger/logger.service';
-import { formatTradeOpenMessage, formatTradeClosedMessage } from './rate-limited/telegram-messages';
+import { formatTradeOpenMessage, formatTradeClosedMessage, formatOrderClosedMessage } from './rate-limited/telegram-messages';
 
 import { TelegramService } from './rate-limited/telegram.service';
-import { Trade, TradeEvent } from './trade-interfaces';
+import { Order, Trade, TradeEvent } from './notify-interfaces';
 
 export interface NotifyJob {
   event: TradeEvent;
-  trade: Trade;
+  payload: Trade | Order;
 }
 
 @Injectable()
@@ -41,13 +41,16 @@ export class NotifyService {
         let message;
         switch (job.event) {
           case TradeEvent.TRADE_OPEN:
-            message = formatTradeOpenMessage(job.event, job.trade);
+            message = formatTradeOpenMessage(job.payload as Trade, job.event);
             break;
           case TradeEvent.TRADE_BROKEN:
-            message = formatTradeOpenMessage(job.event, job.trade);
+            message = formatTradeOpenMessage(job.payload as Trade, job.event);
             break;
           case TradeEvent.TRADE_CLOSED:
-            message = formatTradeClosedMessage(job.trade);
+            message = formatTradeClosedMessage(job.payload as Trade);
+            break;
+          case TradeEvent.ORDER_CLOSED:
+            message = formatOrderClosedMessage(job.payload as Order);
             break;
         }
 
