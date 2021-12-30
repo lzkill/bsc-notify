@@ -71,6 +71,34 @@ export function formatTradeOpenMessage(trade: Trade, event: TradeEvent) {
 }
 
 export function formatTradeClosedMessage(trade: Trade) {
+  if (trade.hasSiblings) return formatSiblingTradeClosedMessage(trade);
+
+  return formatSingleTradeClosedMessage(trade);
+}
+
+export function formatSiblingTradeClosedMessage(trade: Trade) {
+  const sb = new StringBuilder();
+
+  const icon = emoji.get(':large_yellow_circle:');
+  const title = `Trade #${trade.id} closed:`;
+  sb.append(`${icon} ${bold(title)}`);
+
+  sb.appendLine();
+
+  if (trade.owner) sb.appendLine(`${bold('Owner:')} ${trade.owner}`);
+  if (trade.type) sb.appendLine(`${bold('Type:')} ${trade.type}`);
+  if (trade.strategy) sb.appendLine(`${bold('Strategy:')} ${trade.strategy}`);
+  sb.appendLine(`${bold('Base:')} ${trade.openOffer.base}`);
+  sb.appendLine(`${bold('Open offer:')} ${trade.openOffer.offerId}`);
+  sb.appendLine(`${bold('Close offer:')} ${trade.closeOffer.offerId}`);
+
+  const duration = getTradeDuration(trade);
+  sb.appendLine(`${bold('Duration:')} ${duration}`);
+
+  return sb.toString();
+}
+
+export function formatSingleTradeClosedMessage(trade: Trade) {
   const sb = new StringBuilder();
 
   const profile = tradeProfile(trade);

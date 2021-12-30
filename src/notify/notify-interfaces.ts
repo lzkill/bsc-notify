@@ -23,6 +23,7 @@ export interface Trade {
   status: string;
   strategy?: string;
   type?: string;
+  hasSiblings?: boolean;
 }
 
 export interface Order {
